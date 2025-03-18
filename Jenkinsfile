@@ -5,35 +5,38 @@ pipeline {
         stage('Clone repository') {
             steps {
                 checkout([$class: 'GitSCM',
-                branches: [[name: '*/main']],
-                userRemoteConfigs: [[url: 'https://github.com/Annapoornash/PES1UG22CS100_Jenkins']]])
+                          branches: [[name: '*/main']],
+                          userRemoteConfigs: [[url: 'https://github.com/YourRepo/YourRepoName']]])
             }
         }
 
         stage('Build') {
             steps {
-                // Introduced error: This is an incorrect reference to a build.
-                build 'PES1UG22CS100-1'  // This will fail because no such job exists.
-                sh 'g++ main.cpp -o output'
+                script {
+                    // Introduced intentional failure
+                    echo "Building the project..."
+                    sh 'g++ non_existent_file.cpp -o output'  // This will fail since the file doesn't exist
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh './output'
+                echo "Testing the project..."
+                sh './output'  // This will not run because the build stage failed
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'deploy'
+                echo 'Deploying the project...'
             }
         }
     }
 
     post {
         failure {
-            error 'Pipeline failed'  // This will execute when any stage fails.
+            echo 'Pipeline failed!'  // This will run when any stage fails
         }
     }
 }
